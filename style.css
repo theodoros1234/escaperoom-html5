@@ -33,6 +33,10 @@ html {
     left: 224px;
 }
 
+#foreground-color {
+	display: none;
+}
+
 #LED {
     position: fixed;
     top: 0px;

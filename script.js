@@ -4,6 +4,8 @@ var lcdCursorBlinkInverted = false;
 var displayContainer;
 var prevLedColor = "";
 var congratulationsEnabledPoll;
+var foregroundColorReady = false;
+var canvas, foregroundColor;
 
 function keyCodeToKeypad(code) {
     if (48 <= code && code <= 57)
@@ -58,18 +60,27 @@ function keyUpHandler(event) {
 }*/
 
 window.onload = function() {
+	canvas = document.getElementById("user-display").getContext("2d");
+	foregroundColor = document.getElementById("foreground-color");
     displayContainer = document.getElementById("display-container");
-    window.onresize = function() {
+    canvas.fillStyle = "white";
+    
+	window.onresize = function() {
         var size = Math.min(window.innerWidth/1872, window.innerHeight/624, 1);
         displayContainer.style.scale = size;
     };
     window.onresize();
+	
+	const foregroundColorImage = new Image();
+	foregroundColorImage.src = "foreground_color.png";
+	foregroundColorImage.onload = function () {
+		foregroundColor.getContext("2d").drawImage(foregroundColorImage, 0, 0, 1520, 272);
+		foregroundColorReady = true;
+	};
 };
 
 function drawScreen(pixels) {
     var row=0, col=0;
-    const canvas = document.getElementById("user-display").getContext("2d");
-    canvas.fillStyle = "white";
 
     if (pixels === "") {
         canvas.clearRect(0, 0, 1520, 272);
@@ -82,11 +93,18 @@ function drawScreen(pixels) {
             col=0;
             continue;
         }
+		const x = 16*(col + parseInt(col/5));
+		const y = 16*(row + parseInt(row/8));
+		const width = 16;
+		const height = 16;
         if (c === 'X') {
-            canvas.fillRect(16*(col + parseInt(col/5)), 16*(row + parseInt(row/8)), 16, 16);
+			if (foregroundColorReady)
+				canvas.drawImage(foregroundColor, x, y, width, height, x, y, width, height);
+			else
+				canvas.fillRect(x, y, width, height);
             // canvas.fillRect(col, row, 1, 1);
         } else {
-            canvas.clearRect(16*(col + parseInt(col/5)), 16*(row + parseInt(row/8)), 16, 16);
+            canvas.clearRect(x, y, width, height);
             // canvas.clearRect(col, row, 1, 1);
         }
         col++;
