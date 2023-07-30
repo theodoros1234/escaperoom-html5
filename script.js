@@ -6,6 +6,7 @@ var prevLedColor = "";
 var congratulationsEnabledPoll;
 var foregroundColorReady = false;
 var canvas, foregroundColor;
+var prevPixels = "";
 
 function keyCodeToKeypad(code) {
     if (48 <= code && code <= 57)
@@ -93,22 +94,28 @@ function drawScreen(pixels) {
             col=0;
             continue;
         }
+
 		const x = 16*(col + parseInt(col/5));
 		const y = 16*(row + parseInt(row/8));
 		const width = 16;
 		const height = 16;
-        if (c === 'X') {
-			if (foregroundColorReady)
-				canvas.drawImage(foregroundColor, x, y, width, height, x, y, width, height);
-			else
-				canvas.fillRect(x, y, width, height);
-            // canvas.fillRect(col, row, 1, 1);
-        } else {
-            canvas.clearRect(x, y, width, height);
-            // canvas.clearRect(col, row, 1, 1);
+
+        if (c !== prevPixels[row*81 + col]) {
+            if (c === 'X') {
+                if (foregroundColorReady)
+                    canvas.drawImage(foregroundColor, x, y, width, height, x, y, width, height);
+                else
+                    canvas.fillRect(x, y, width, height);
+                // canvas.fillRect(col, row, 1, 1);
+            } else {
+                canvas.clearRect(x, y, width, height);
+                // canvas.clearRect(col, row, 1, 1);
+            }
         }
         col++;
     }
+
+    prevPixels = pixels;
 }
 
 Module["onRuntimeInitialized"] = function () {
